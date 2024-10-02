@@ -40,15 +40,12 @@
 //! ```
 //!
 //! ## What's with all the traits?
-//! librashader-reflect is designed to be compiler-agnostic. In the future, we will allow usage of
-//! [naga](https://docs.rs/naga/latest/naga/index.html), a pure-Rust shader compiler, when it has
-//! matured enough to support [the features librashader needs](https://github.com/gfx-rs/naga/issues/1012).
-//!
-//! In the meanwhile, the only supported compilation type is [GlslangCompilation](crate::front::SpirvCompilation),
-//! which does transpilation via [glslang](https://github.com/KhronosGroup/glslang) and [SPIRV-Cross](https://github.com/KhronosGroup/SPIRV-Cross).
-#![feature(impl_trait_in_assoc_type)]
-#![feature(let_chains)]
-
+//! librashader-reflect is designed to be compiler-agnostic. [naga](https://docs.rs/naga/latest/naga/index.html),
+//! a pure-Rust shader compiler, as well as SPIRV-Cross via [SpirvCompilation](crate::front::SpirvCompilation)
+//! is supported.
+#![cfg_attr(not(feature = "stable"), feature(impl_trait_in_assoc_type))]
+#![allow(stable_features)]
+#![cfg_attr(not(feature = "stable"), feature(c_str_literals))]
 /// Shader codegen backends.
 pub mod back;
 /// Error types.
