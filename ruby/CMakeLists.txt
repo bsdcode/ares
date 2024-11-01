@@ -44,6 +44,7 @@ target_sources(
     cmake/os-macos.cmake
     cmake/os-windows.cmake
     cmake/os-linux.cmake
+    cmake/os-freebsd.cmake
 )
 
 target_link_libraries(ruby PUBLIC ares::nall)

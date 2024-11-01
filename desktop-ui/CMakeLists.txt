@@ -18,6 +18,7 @@ target_sources(
     cmake/os-macos.cmake
     cmake/os-linux.cmake
     cmake/os-windows.cmake
+    cmake/os-freebsd.cmake
 )
 
 include(cmake/sources.cmake)

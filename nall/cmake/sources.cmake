@@ -291,6 +291,8 @@ target_sources(
   PRIVATE
     cmake/os-macos.cmake
     cmake/os-windows.cmake
-    cmake/os-linux.cmake)
+    cmake/os-linux.cmake
+    cmake/os-freebsd.cmake
+)
 
 target_sources(nall PRIVATE cmake/sources.cmake)

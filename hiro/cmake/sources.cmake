@@ -448,4 +448,5 @@ target_sources(
     cmake/sources.cmake
     cmake/os-windows.cmake
     cmake/os-linux.cmake
+    cmake/os-freebsd.cmake
 )

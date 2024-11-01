@@ -281,6 +281,7 @@ target_sources(
     cmake/os-macos.cmake
     cmake/os-windows.cmake
     cmake/os-linux.cmake
+    cmake/os-freebsd.cmake
 )
 
 set_source_files_properties(ares ${ARES_HEADER_SOURCES} PROPERTIES HEADER_FILE_ONLY TRUE)

@@ -117,7 +117,7 @@ namespace nall {
     static constexpr bool BSD     = 0;
   };
 #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__)
-  #define PLATFORM_BSD
+  // #define PLATFORM_BSD
   struct Platform {
     static constexpr bool Windows = 0;
     static constexpr bool MacOS   = 0;
