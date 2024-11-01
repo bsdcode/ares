@@ -1,0 +1,82 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "environmentVars",
+      "hidden": true,
+      "cacheVariables": {
+        "ARES_PROFILE_ACCURACY": false,
+        "ENABLE_VULKAN": true,
+        "ARES_BUILD_LOCAL": true,
+        "ENABLE_CCACHE": true
+      }
+    },
+    {
+      "name": "macos",
+      "displayName": "macOS",
+      "description": "Xcode project (host architecture by default)",
+      "inherits": ["environmentVars"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build_macos",
+      "cacheVariables": {
+        "CMAKE_OSX_DEPLOYMENT_TARGET": {"type": "STRING", "value": "10.13"},
+        "ARES_CODESIGN_IDENTITY": {"type": "STRING", "value": "$penv{CODESIGN_IDENT}"},
+        "ARES_CODESIGN_TEAM": {"type": "STRING", "value": "$penv{CODESIGN_TEAM}"},
+        "ENABLE_COMPILER_TRACE": true,
+        "ENABLE_CCACHE": true
+      }
+    },
+    {
+      "name": "windows",
+      "displayName": "Windows (Visual Studio, ClangCL)",
+      "description": "Visual Studio project using ClangCL (host architecture)",
+      "inherits": ["environmentVars"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "binaryDir": "${sourceDir}/build_vsclang",
+      "generator": "Visual Studio 17 2022",
+      "toolset": "ClangCL",
+      "cacheVariables": {
+        "ENABLE_CCACHE": true
+      }
+    },
+    {
+      "name": "windows-msvc",
+      "displayName": "Windows (Visual Studio, MSVC)",
+      "description": "Visual Studio project using MSVC (host architecture)",
+      "inherits": ["environmentVars"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "binaryDir": "${sourceDir}/build_msvc",
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "ENABLE_CCACHE": true
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows",
+      "configurePreset": "windows",
+      "displayName": "Windows build (host architecture)",
+      "description": "Windows build (host architecture)",
+      "configuration": "RelWithDebInfo"
+    }
+  ]
+}

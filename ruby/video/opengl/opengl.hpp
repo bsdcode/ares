@@ -16,9 +16,10 @@
   #error "ruby::OpenGL3: unsupported platform"
 #endif
 
+#include <librashader/librashader_ld.h>
+
 #include "bind.hpp"
 #include "utility.hpp"
-#include "librashader_ld.h"
 
 struct OpenGL;
 

@@ -6,9 +6,9 @@
 //
 
 #include <Metal/Metal.h>
-#include <MetalKit/MetalKit.h>
+#include <MetalKit/MTKView.h>
 
-#include "librashader_ld.h"
+#include <librashader/librashader_ld.h>
 #include "ShaderTypes.h"
 
 struct Metal;

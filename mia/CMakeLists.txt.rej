@@ -1,0 +1,10 @@
+diff a/mia/CMakeLists.txt b/mia/CMakeLists.txt	(rejected hunks)
+@@ -119,7 +119,7 @@ target_sources(
+ 
+ target_compile_definitions(mia PUBLIC MIA_LIBRARY)
+ 
+-target_link_libraries(mia PUBLIC ares::nall ares::ares PRIVATE tzxfile)
++target_link_libraries(mia PUBLIC ares::nall ares::ares ares::hiro PRIVATE tzxfile)
+ 
+ add_executable(mia-ui mia.cpp resource/resource.cpp)
+ 

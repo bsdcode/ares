@@ -17,127 +17,203 @@ Nightly Builds
 Automated, untested builds of ares are available for Windows and macOS as a [pre-release](https://github.com/higan-emu/ares/releases/tag/nightly). 
 Only the latest nightly build is kept.
 
-Prerequisites
+Building
 -------------
+> [!IMPORTANT]  
+> If you are reading this, this build system is still heavily under development. Documentation is incomplete, and it is possible that commands listed here will change or temporarily not function. Thank you for testing! Please feel free to tag @yam on the [ares Discord](https://discord.com/invite/gz2quhk2kv) with any issues.
 
-### *nix building
+Building ares requires [CMake](https://cmake.org/download/) 3.28 or greater.
 
-###### Minimum required packages:
+### Windows
+
+ares on Windows can be built either via the default Windows shell, or within an MSYS2/MinGW environment.
+
+#### Windows Command Prompt (MSVC/Clang-CL)
+
+###### Prerequisites
+
+* Windows 10 or higher
+* CMake 3.28 or higher
+* Git for Windows
+* Visual Studio 17 2022
+
+Ensure that the "Desktop Development with C++" package is included in your Visual Studio 2022 installation. Building ares with clang also requires that the "C++ Clang tools for Windows" package is installed.
+
+###### Configuration
+
+First, clone the ares repository:
 ```
-g++ make pkg-config libgtk-3-dev libcanberra-gtk-module libgl-dev libasound2-dev
-```  
-###### Additional Audio Drivers
-ares supports additional audio drivers besides the ALSA drivers included above. Installing these additional packages will allow them to be selected in Settings > Drivers:  
-`libao-dev libopenal-dev`
+git clone https://github.com/ares-emulator/ares
+cd ares
+```
+A Visual Studio project can be setup by using the `windows` CMake preset:
+```
+cmake --preset windows
+```
+This preset will generate a Visual Studio project for ares using Clang-CL that will build all targets and package dependencies appropriately. 
 
-###### GTK2 & GTK3
-By default, GTK3 is used, but support for GTK2 is available. You will need to install the additional package `libgtk2.0-dev` as well as specifying the command line option `hiro=gtk2` at compile time.
+If you prefer to use the MSVC compiler, specify the `windows-msvc` preset:
+```
+cmake --preset windows-msvc
+```
+Visual Studio presets will generate single-architecture configuration with the host architecture will be created; if you would like to compile for a specific architecture, you may specify `-A x64` or `-A arm64` as appropriate. Multi-architecture configuration is not supported. 32-bit `x86` builds are not currently supported (*note 10/14: WIP, may work, just untested*).
+#### MSYS2/MinGW
 
-###### SDL2 for input
-If you would like to use SDL for input (e.g. for using a controller), you will need to install the `libsdl2-dev` and `libsdl2-2.0-0` packages and perform a clean build of ares.
-You should then be able to select SDL for input in the Settings > Drivers menu.
+Under MSYS2/MinGW, the same Visual Studio CMake presets above are also supported. Under MSYS2/MinGW, we may also however build with GNU Clang or GCC.
 
-##### Building with clang
+###### Prerequisites
 
-clang++ is now the preferred compiler for ares. If clang is detected on Windows/macOS/BSD, it will be selected by default. On Linux and other platforms, g++ remains the default if present. To build with clang, it is necessary to install both the `clang` and `lld` packages. If you would like to manually specify a compiler, you can use the following option: `compiler=[g++|clang++]`  
+* MSYS2
+* An appropriate MSYS2 [environment](https://www.msys2.org/docs/environments/), such as CLANG64
+* A suitable MinGW toolchain, for example [mingw-w64-llvm](https://packages.msys2.org/base/mingw-w64-llvm) 
+* Git (`pacman -S git`)
+* CMake 3.28 or higher (`pacman -S cmake`)
 
-##### Librashader Support
-If you do not want to include librashader support, you can pass the following option to the `make` command to skip these requirements using: `librashader=false`
+First, clone the ares repository:
+```
+git clone https://github.com/ares-emulator/ares
+cd ares
+```
+Then, invoke CMake as normal with your chosen generator, e.g Ninja:
+```
+mkdir build && cd build
+cmake .. -G "Ninja Multi-Config"
+```
+After configuration, build ares:
+```
+cmake --build . --config RelWithDebInfo
+```
+For further configuration options, see the [Build Options] section.
+### macOS
 
-Librashader requires rust in order to build. You can install it with the following command:
-``` 
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.cargo/env
-rustup toolchain install nightly
+###### Prerequisites
+
+* macOS 10.15 or higher
+* Xcode 12.4 or higher
+* CMake 3.28 or higher
+
+###### Configuration
+
+First, clone the ares repository:
+```
+git clone https://github.com/ares-emulator/ares
+cd ares
+```
+macOS builds can be setup by using the `macos` CMake preset:
+```
+cmake --preset macos
+```
+This generates an Xcode project in the `build_macos` folder that builds all `ares` targets including subprojects. By default, a single-architecture project with the host architecture is generated. To build universal binaries or cross-compile, the `-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"` option can be specified in addition to the preset.
+
+You may also build with other generators such as Make or Ninja. To do this, invoke CMake as normal:
+```
+mkdir my_build && cd my_build
+cmake .. -G "GNU Makefiles"
+```
+After configuration, build ares:
+```
+make desktop-ui -j8
+```
+For further configuration options, see the [Build Options] section.
+
+### Linux
+
+###### Prerequisites
+
+* Git
+* CMake 3.28 or higher
+* A compiler toolchain such as clang or gcc
+
+ares requires development versions of the following packages in order to build:
+
+* X11
+* libGL
+* GTK3 (gtk+-3.0)
+
+Recommended development packages include:
+
+* [librashader](https://software.opensuse.org//download.html?project=home%3Achyyran%3Alibrashader&package=librashader)
+* SDL2
+
+You may also configure with development packages for other audio drivers:
+
+* OpenAL
+* AO
+* ALSA
+* PulseAudio
+
+Optional but recommended build tools include:
+
+* Ninja
+* clang
+* Ccache
+
+###### Configuration
+
+First, clone the ares repository:
+```
+git clone https://github.com/ares-emulator/ares
+cd ares
+```
+Building ares with `clang` and Ninja is recommended:
+```
+mkdir build && cd build
+cmake .. -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G "Ninja Multi-Config"
+```
+The generation step will report what features are enabled and disabled according to the libraries found on your system. Next, build ares:
+```
+cmake --build .
+```
+After building, products can be found in the `rundir` folder. ares can be run from this location, or the rundir can be relocated. ares can also be `install`ed:
+```
+cmake --install . --prefix <your install prefix>
 ```
 
-In order to build librashader, change into the `ares/thirdparty/librashader` directory and run the script `build-librashader.sh`
-Note that once the build completes, it will instruct you to run three copy commands to install the library on your system. These paths may be different depending on Linux distribution. 
-  
---------------
+### Build Options
 
-### Windows building
+When generating/configuring ares on any platform, a number of configuration options are available.
 
-To build on Windows, using MSYS2 is recommended which can be download [here](https://www.msys2.org/). Follow the instructions
-on this page to install and setup an appropriate MINGW64 environment. Running the command:  
+##### ARES_CORES
+Default: `"a26;fc;sfc;sg;ms;md;ps1;pce;ng;msx;cv;myvision;gb;gba;ws;ngp;spec;n64"`
+
+By default, ares configures with all emulator cores. To specify that only a subset of cores should be built, use the `-DARES_CORES` option. For example:
 ```
-pacman -S --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-SDL2
-```  
-from the MSYS2 MSYS terminal should setup everything you need to compile ares. Note that in order to compile, you will want to be in a MINGW64 terminal window after install and setup is complete. 
-
-##### Building with clang
-
-clang is available through Visual Studio (or Build Tools for Visual Studio) through its installer and can be used to build ares. You will still need to supply GNU make in this instance. MSYS2 also offers a clang environment. You will want to make sure you select the clangw64 option during installation of MSYS2 which should provide and additional CLANG64 pre-configured environment. Install the clang toolchain package from the MSYS2 terminal:  
-```
-pacman -S mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-SDL2
-```  
-Once complete, open a CLANG64 terminal window and proceed with building ares. 
-
-###### Debug Symbols
-When building with clang, by default symbols will be generated for debug builds using an MSVC compatible format (CodeView) for use with Windows debugging tools. In order to generate GDB compatible symbols, specify the following option: `symformat=gdb`  
-
-###### Librashader Support
-ares has introduced support for the [librashader](https://github.com/SnowflakePowered/librashader) library, which is a preprocessor, compiler, and runtime for RetroArch 'slang' shaders. If you are not interested in working with librashaders, you can pass the following option to the `make` command to skip these requirements using: `librashader=false`
-
-Building the librashader library on Windows requires Rust. Follow these steps to prepare your system and build the librashader library:
-
-1. Download and execute the rustup-init.exe installer from: https://rustup.rs/
-2. Open a new Windows terminal and run the following commands:
-    ```
-    rustup toolchain install nightly
-    rustup default nightly
-    ```
-3. With Rust successfully installed, you will need to update your PATH environment variable within your MSYS2 environment. In an MSYS2 shell, open $HOME/.bash_profile and append something like the following (note you will need to replace both instances of %USER_NAME% with the real user name you used to install Rust):
-    ```
-    if [ -d "/C/Users/%USER_NAME%/.cargo/bin" ] ; then
-      PATH="/C/Users/%USER_NAME%/.cargo/bin:${PATH}"
-    fi
-    ```
-4. Open a new MSYS2 based shell for the compiler you are using (MinGW64|CLANG64|UCRT64), execute `rustup` to validate the path is set properly within your MSYS2 environment.
-5. In your MSYS2 compiler shell, `cd` into the `ares/thirdparty/librashader` directory
-6. Execute the build script, build should complete successfully:
-    ```
-    ./build-librashader.sh
-    ```
-
-This only needs to be done once, or anytime the librashader library is updated. Once built, ares will build with librashader support by default requiring no additional flags.
-
-Compilation
------------
-
-Check out the source code by running this command:
-
-```
-git clone https://github.com/ares-emulator/ares.git
+cmake .. -G Ninja -DARES_CORES="a26;n64;sg;myvision"
 ```
 
-From the root of the project directory run:
+##### CMAKE_BUILD_TYPE
+Default: `RelWithDebInfo`
+
+Multi-configuration generators (Xcode, Visual Studio, Ninja Multi-Config) will automatically configure with all build configurations available. Single-configuration generators will configure by default using the `RelWithDebInfo` configuration. To specify another configuration, use `-DCMAKE_BUILD_TYPE`:
 
 ```
-make -j4
-```
- 
-`-j#` indicates number of parallel build processes, and shouldn't be set higher than N-1 cores on your processor.  Specifying this option can significantly decrease the time to build this project. There are multiple build types available and it defaults to an 'optimized' build. Build types can be specified using: `build=[debug|stable|release|minified|optimized]`  
-
-Build options can be found in the following two make files: nall/GNUmakefile desktop-ui/GNUmakefile
-
-To start compilation from the beginning, run the following prior to compiling:
-
-```
-make clean
+cmake .. -G "MinGW Makefiles" -DARES_CORES="a26" -DCMAKE_BUILD_TYPE=Release
 ```
 
-#### Building specific cores  
-If you would like to build a subset of cores, you can specify the `cores="core1 core2"` option. Currently available cores:  
-```
-a26 fc sfc n64 sg ms md ps1 pce ng msx cv myvision gb gba ws ngp spec
-```  
+Supported build types are `<Debug|Release|RelWithDebInfo|MinSizeRel>`.
+##### ENABLE_CCACHE
+Default: `ON`
 
-Build Output
-------------
+ares will try to use CCache by default on all platforms to speed up compilation. You may disable CCache if you are experimenting with compilation options or the build system by building with `-DENABLE_CCACHE=OFF`.
 
-There is a single binary produced at the end of compilation which can be found in `desktop-ui/out`. On OS's besides Linux, the `Database` & `Shader` directories are copied over here as well. On Linux, running `make install` after compilation will copy these directories and binary into suitable locations (see desktop-ui/GNUmakefile for details). Alternatively, these directories can be copied from `thirdparty/slang-shaders/*` into a `Shader` directory, and by copying `mia/Database/*`
+##### ARES_BUILD_LOCAL
+Default: `ON`
 
+When this option is enabled, certain compiler optimizations are enabled to optimize performance for the host/target system. This option also controls certain entitlements and runtime options on macOS that interfere with may debugging but are necessary for notarization and distribution.
+
+##### ARES\_ENABLE_LIBRASHADER
+Default: `ON`
+
+This flag may be disabled if you wish to compile without librashader and slang-shaders, producing a slimmer build. Note that the librashader header is still required to build without librashader; however, this header is bundled as a dependency on all platforms and it should not be necessary to install any dependency to build without librashader.
+
+##### ARES_PROFILE_ACCURACY
+Default: `OFF`
+
+Mostly unused in current versions of ares; acts as a compile-time switch for certain performance-sensitive areas of emulation.
+
+# Legacy build system
+
+Legacy build information is available [here](./Legacy%20Build%20System.md)
 
 Command-line options
 --------------------

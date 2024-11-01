@@ -1,10 +1,33 @@
-*.moc
-*.user
-*.xcuserdata
-.vs/
-.vscode/
-.idea/
-cmake-*/
+# Exclude everything
+/*
+
+# Except for default project files
+!/.github
+!/ares
+!/desktop-ui
+!/hiro
+!/cmake
+!/libco
+!/mia
+!/nall
+!/ruby
+!/scripts
+!/tests/i8080
+!/thirdparty
+!/tools
+!/GNUMakefile
+!/LICENSE
+!/README.md
+!/Legacy Build System.md
+!.cmake-format.json
+!.editorconfig
+!.gitmodules
+!.gitignore
+!buildspec.json
+!CMakeLists.txt
+!CMakePresets.json
+
+/cmake/.CMakeBuildNumber
 obj/
 out/
 obj-amd64/
@@ -13,6 +36,8 @@ out-amd64/
 out-arm64/
 thirdparty/SDL/SDL
 thirdparty/SDL/libSDL2-2.0.0.dylib
+ruby/video/metal/shaders.metallib
+ruby/video/metal/shaders.ir
 macos-xcode/
 .swiftpm
 *.xcodeproj
